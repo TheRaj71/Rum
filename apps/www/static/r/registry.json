@@ -1,0 +1,93 @@
+{
+  "$schema": "https://rum.dev/schema/registry.json",
+  "name": "svelte-registry",
+  "items": [
+    {
+      "name": "card",
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "blocks/card/Card.svelte",
+          "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLDivElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<div\n\tclass={cn('rounded-xl border bg-card text-card-foreground shadow', className)}\n\t{...restProps}\n>\n\t{@render children?.()}\n</div>\n",
+          "type": "registry:ui",
+          "target": "$lib/components/card/Card.svelte"
+        },
+        {
+          "path": "blocks/card/CardContent.svelte",
+          "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLDivElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<div class={cn('p-6 pt-0', className)} {...restProps}>\n\t{@render children?.()}\n</div>\n",
+          "type": "registry:ui",
+          "target": "$lib/components/card/CardContent.svelte"
+        },
+        {
+          "path": "blocks/card/CardDescription.svelte",
+          "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLParagraphElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<p class={cn('text-sm text-muted-foreground', className)} {...restProps}>\n\t{@render children?.()}\n</p>\n",
+          "type": "registry:ui",
+          "target": "$lib/components/card/CardDescription.svelte"
+        },
+        {
+          "path": "blocks/card/CardFooter.svelte",
+          "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLDivElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<div class={cn('flex items-center p-6 pt-0', className)} {...restProps}>\n\t{@render children?.()}\n</div>\n",
+          "type": "registry:ui",
+          "target": "$lib/components/card/CardFooter.svelte"
+        },
+        {
+          "path": "blocks/card/CardHeader.svelte",
+          "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLDivElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<div class={cn('flex flex-col space-y-1.5 p-6', className)} {...restProps}>\n\t{@render children?.()}\n</div>\n",
+          "type": "registry:ui",
+          "target": "$lib/components/card/CardHeader.svelte"
+        },
+        {
+          "path": "blocks/card/CardTitle.svelte",
+          "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLHeadingElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<h3 class={cn('font-semibold leading-none tracking-tight', className)} {...restProps}>\n\t{@render children?.()}\n</h3>\n",
+          "type": "registry:ui",
+          "target": "$lib/components/card/CardTitle.svelte"
+        },
+        {
+          "path": "blocks/card/index.ts",
+          "content": "export { default as Card } from './Card.svelte';\nexport { default as CardHeader } from './CardHeader.svelte';\nexport { default as CardContent } from './CardContent.svelte';\nexport { default as CardTitle } from './CardTitle.svelte';\nexport { default as CardDescription } from './CardDescription.svelte';\nexport { default as CardFooter } from './CardFooter.svelte';\n",
+          "type": "registry:lib",
+          "target": "$lib/components/card/index.ts"
+        }
+      ]
+    },
+    {
+      "name": "counter",
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "hooks/counter/counter.svelte.ts",
+          "content": "/**\n * A reactive counter hook demonstrating Svelte 5's universal reactivity pattern.\n * This hook can be used across multiple components to share reactive state.\n *\n * @example\n * ```svelte\n * <script>\n *   import { createCounter } from '$lib/registry/default/hooks/counter/counter.svelte';\n *\n *   const counter = createCounter(0);\n * </script>\n *\n * <button onclick={counter.increment}>\n *   Count: {counter.count}\n * </button>\n * ```\n */\n\ninterface CounterOptions {\n\t/** Initial count value (default: 0) */\n\tinitial?: number;\n\t/** Minimum allowed value (default: -Infinity) */\n\tmin?: number;\n\t/** Maximum allowed value (default: Infinity) */\n\tmax?: number;\n\t/** Step value for increment/decrement (default: 1) */\n\tstep?: number;\n}\n\ninterface Counter {\n\t/** Current count value */\n\treadonly count: number;\n\t/** Increment the counter by step value */\n\tincrement: () => void;\n\t/** Decrement the counter by step value */\n\tdecrement: () => void;\n\t/** Reset the counter to initial value */\n\treset: () => void;\n\t/** Set the counter to a specific value */\n\tset: (value: number) => void;\n}\n\nexport function createCounter(options: CounterOptions = {}): Counter {\n\tconst { initial = 0, min = -Infinity, max = Infinity, step = 1 } = options;\n\n\tlet count = $state(initial);\n\n\tfunction clamp(value: number): number {\n\t\treturn Math.min(Math.max(value, min), max);\n\t}\n\n\treturn {\n\t\tget count() {\n\t\t\treturn count;\n\t\t},\n\t\tincrement: () => {\n\t\t\tcount = clamp(count + step);\n\t\t},\n\t\tdecrement: () => {\n\t\t\tcount = clamp(count - step);\n\t\t},\n\t\treset: () => {\n\t\t\tcount = initial;\n\t\t},\n\t\tset: (value: number) => {\n\t\t\tcount = clamp(value);\n\t\t}\n\t};\n}\n",
+          "type": "registry:hook",
+          "target": "$lib/hooks/counter/counter.svelte.ts"
+        },
+        {
+          "path": "hooks/counter/index.ts",
+          "content": "export { createCounter } from './counter.svelte';\n",
+          "type": "registry:lib",
+          "target": "$lib/hooks/counter/index.ts"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "ui/button/Button.svelte",
+          "content": "<script lang=\"ts\">\n\timport { tv, type VariantProps } from 'tailwind-variants';\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLButtonAttributes } from 'svelte/elements';\n\n\tconst buttonVariants = tv({\n\t\tbase: 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',\n\t\tvariants: {\n\t\t\tvariant: {\n\t\t\t\tdefault: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',\n\t\t\t\tdestructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',\n\t\t\t\toutline:\n\t\t\t\t\t'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',\n\t\t\t\tsecondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',\n\t\t\t\tghost: 'hover:bg-accent hover:text-accent-foreground',\n\t\t\t\tlink: 'text-primary underline-offset-4 hover:underline'\n\t\t\t},\n\t\t\tsize: {\n\t\t\t\tdefault: 'h-9 px-4 py-2',\n\t\t\t\tsm: 'h-8 rounded-md px-3 text-xs',\n\t\t\t\tlg: 'h-10 rounded-md px-8',\n\t\t\t\ticon: 'h-9 w-9'\n\t\t\t}\n\t\t},\n\t\tdefaultVariants: {\n\t\t\tvariant: 'default',\n\t\t\tsize: 'default'\n\t\t}\n\t});\n\n\ttype ButtonVariants = VariantProps<typeof buttonVariants>;\n\n\tinterface Props extends HTMLButtonAttributes {\n\t\tvariant?: ButtonVariants['variant'];\n\t\tsize?: ButtonVariants['size'];\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet {\n\t\tvariant = 'default',\n\t\tsize = 'default',\n\t\tchildren,\n\t\tclass: className,\n\t\t...restProps\n\t}: Props = $props();\n</script>\n\n<button class={buttonVariants({ variant, size, class: className })} {...restProps}>\n\t{@render children?.()}\n</button>\n",
+          "type": "registry:ui",
+          "target": "$lib/components/button/Button.svelte"
+        },
+        {
+          "path": "ui/button/index.ts",
+          "content": "export { default as Button } from './Button.svelte';\n",
+          "type": "registry:lib",
+          "target": "$lib/components/button/index.ts"
+        }
+      ],
+      "dependencies": [
+        "tailwind-variants"
+      ]
+    }
+  ]
+}

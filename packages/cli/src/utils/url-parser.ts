@@ -1,0 +1,169 @@
+/**
+ * URL Parser Utilities
+ * Implements URL parsing for registry references
+ */
+
+/**
+ * Represents a parsed namespaced reference
+ */
+export interface NamespacedReference {
+  namespace: string;
+  name: string;
+}
+
+/**
+ * Parse a namespaced reference (e.g., @namespace/component)
+ * Returns the namespace and component name, or null if not namespaced
+ * 
+ * Requirement 6.3: THE CLI SHALL support namespaced registry references (e.g., @acme/button)
+ * 
+ * @param ref - The reference string to parse
+ * @returns Parsed namespace and name, or null if not a valid namespaced reference
+ * 
+ * @example
+ * parseNamespacedReference('@acme/button') // { namespace: 'acme', name: 'button' }
+ * parseNamespacedReference('@org/ui/card') // { namespace: 'org', name: 'ui/card' }
+ * parseNamespacedReference('button') // null
+ */
+export function parseNamespacedReference(ref: string): NamespacedReference | null {
+  // Must start with @ followed by namespace, then /, then component name
+  // Namespace cannot contain /
+  // Component name can contain / for nested paths
+  const match = ref.match(/^@([^/]+)\/(.+)$/);
+  if (!match) {
+    return null;
+  }
+  return { namespace: match[1], name: match[2] };
+}
+
+/**
+ * Check if a string is a valid namespaced reference
+ * 
+ * @param ref - The reference string to check
+ * @returns true if the reference is namespaced (starts with @namespace/)
+ */
+export function isNamespacedReference(ref: string): boolean {
+  return parseNamespacedReference(ref) !== null;
+}
+
+/**
+ * Substitute {name} placeholder in URL template with component name
+ * 
+ * Requirement 6.4: WHEN a registry URL includes {name} placeholder, 
+ * THE CLI SHALL substitute the component name
+ * 
+ * @param urlTemplate - URL template containing {name} placeholders
+ * @param componentName - Component name to substitute
+ * @returns URL with all {name} placeholders replaced
+ * 
+ * @example
+ * substituteUrlTemplate('https://example.com/r/{name}.json', 'button')
+ * // 'https://example.com/r/button.json'
+ * 
+ * substituteUrlTemplate('https://{name}.example.com/{name}.json', 'button')
+ * // 'https://button.example.com/button.json'
+ */
+export function substituteUrlTemplate(urlTemplate: string, componentName: string): string {
+  return urlTemplate.replace(/\{name\}/g, componentName);
+}
+
+/**
+ * Check if a URL template contains {name} placeholder
+ * 
+ * @param urlTemplate - URL template to check
+ * @returns true if the template contains {name} placeholder
+ */
+export function hasNamePlaceholder(urlTemplate: string): boolean {
+  return urlTemplate.includes('{name}');
+}
+
+/**
+ * Check if a dependency reference is a URL (http:// or https://)
+ * 
+ * @param dep - Dependency reference to check
+ * @returns true if the reference is a URL
+ */
+export function isUrlDependency(dep: string): boolean {
+  return dep.startsWith('http://') || dep.startsWith('https://');
+}
+
+/**
+ * Build an item URL from a registry base URL and component name
+ * 
+ * @param registryUrl - Base registry URL (may include registry.json)
+ * @param componentName - Component name
+ * @returns Full URL to the component's JSON file
+ * 
+ * @example
+ * buildItemUrl('https://example.com/registry.json', 'button')
+ * // 'https://example.com/r/button.json'
+ * 
+ * buildItemUrl('https://example.com/', 'button')
+ * // 'https://example.com/r/button.json'
+ */
+export function buildItemUrl(registryUrl: string, componentName: string): string {
+  // Remove trailing slash if present
+  const baseUrl = registryUrl.replace(/\/$/, '');
+  // Remove registry.json if present
+  const cleanUrl = baseUrl.replace(/\/registry\.json$/, '');
+  return `${cleanUrl}/r/${componentName}.json`;
+}
+
+/**
+ * Parse a GitHub repository reference in format github:owner/repo
+ * 
+ * @param ref - GitHub reference string
+ * @returns Parsed owner and repo, or null if not a valid GitHub reference
+ * 
+ * @example
+ * parseGitHubRepoReference('github:shadcn/ui')
+ * // { owner: 'shadcn', repo: 'ui' }
+ * 
+ * parseGitHubRepoReference('https://github.com/shadcn/ui')
+ * // null (not in github: format)
+ */
+export function parseGitHubRepoReference(ref: string): { owner: string; repo: string } | null {
+  const match = ref.match(/^github:([^/]+)\/([^/]+)$/);
+  if (!match) {
+    return null;
+  }
+  return { owner: match[1], repo: match[2] };
+}
+
+/**
+ * Check if a reference is a GitHub repository reference
+ * 
+ * @param ref - Reference string to check
+ * @returns true if the reference is in github:owner/repo format
+ */
+export function isGitHubRepoReference(ref: string): boolean {
+  return ref.startsWith('github:');
+}
+
+/**
+ * Normalize a registry URL by ensuring it ends with registry.json
+ * 
+ * @param url - Registry URL to normalize
+ * @returns Normalized URL ending with registry.json
+ * 
+ * @example
+ * normalizeRegistryUrl('https://example.com')
+ * // 'https://example.com/registry.json'
+ * 
+ * normalizeRegistryUrl('https://example.com/')
+ * // 'https://example.com/registry.json'
+ * 
+ * normalizeRegistryUrl('https://example.com/registry.json')
+ * // 'https://example.com/registry.json'
+ */
+export function normalizeRegistryUrl(url: string): string {
+  // Remove trailing slash
+  let normalized = url.replace(/\/$/, '');
+  
+  // Add registry.json if not present
+  if (!normalized.endsWith('/registry.json') && !normalized.endsWith('.json')) {
+    normalized = `${normalized}/registry.json`;
+  }
+  
+  return normalized;
+}

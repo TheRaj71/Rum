@@ -1,0 +1,18 @@
+{
+  "name": "counter",
+  "type": "registry:block",
+  "files": [
+    {
+      "path": "hooks/counter/counter.svelte.ts",
+      "content": "/**\n * A reactive counter hook demonstrating Svelte 5's universal reactivity pattern.\n * This hook can be used across multiple components to share reactive state.\n *\n * @example\n * ```svelte\n * <script>\n *   import { createCounter } from '$lib/registry/default/hooks/counter/counter.svelte';\n *\n *   const counter = createCounter(0);\n * </script>\n *\n * <button onclick={counter.increment}>\n *   Count: {counter.count}\n * </button>\n * ```\n */\n\ninterface CounterOptions {\n\t/** Initial count value (default: 0) */\n\tinitial?: number;\n\t/** Minimum allowed value (default: -Infinity) */\n\tmin?: number;\n\t/** Maximum allowed value (default: Infinity) */\n\tmax?: number;\n\t/** Step value for increment/decrement (default: 1) */\n\tstep?: number;\n}\n\ninterface Counter {\n\t/** Current count value */\n\treadonly count: number;\n\t/** Increment the counter by step value */\n\tincrement: () => void;\n\t/** Decrement the counter by step value */\n\tdecrement: () => void;\n\t/** Reset the counter to initial value */\n\treset: () => void;\n\t/** Set the counter to a specific value */\n\tset: (value: number) => void;\n}\n\nexport function createCounter(options: CounterOptions = {}): Counter {\n\tconst { initial = 0, min = -Infinity, max = Infinity, step = 1 } = options;\n\n\tlet count = $state(initial);\n\n\tfunction clamp(value: number): number {\n\t\treturn Math.min(Math.max(value, min), max);\n\t}\n\n\treturn {\n\t\tget count() {\n\t\t\treturn count;\n\t\t},\n\t\tincrement: () => {\n\t\t\tcount = clamp(count + step);\n\t\t},\n\t\tdecrement: () => {\n\t\t\tcount = clamp(count - step);\n\t\t},\n\t\treset: () => {\n\t\t\tcount = initial;\n\t\t},\n\t\tset: (value: number) => {\n\t\t\tcount = clamp(value);\n\t\t}\n\t};\n}\n",
+      "type": "registry:hook",
+      "target": "$lib/hooks/counter/counter.svelte.ts"
+    },
+    {
+      "path": "hooks/counter/index.ts",
+      "content": "export { createCounter } from './counter.svelte';\n",
+      "type": "registry:lib",
+      "target": "$lib/hooks/counter/index.ts"
+    }
+  ]
+}

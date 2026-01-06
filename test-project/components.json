@@ -1,0 +1,15 @@
+{
+  "$schema": "https://rum.dev/schema/config.json",
+  "style": "default",
+  "tailwind": {
+    "config": "",
+    "css": "src/app.css",
+    "baseColor": "slate"
+  },
+  "aliases": {
+    "components": "$lib/components",
+    "utils": "$lib/utils",
+    "hooks": "$lib/hooks",
+    "lib": "$lib"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "card",
+  "type": "registry:block",
+  "files": [
+    {
+      "path": "blocks/card/Card.svelte",
+      "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLDivElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<div\n\tclass={cn('rounded-xl border bg-card text-card-foreground shadow', className)}\n\t{...restProps}\n>\n\t{@render children?.()}\n</div>\n",
+      "type": "registry:ui",
+      "target": "$lib/components/card/Card.svelte"
+    },
+    {
+      "path": "blocks/card/CardContent.svelte",
+      "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLDivElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<div class={cn('p-6 pt-0', className)} {...restProps}>\n\t{@render children?.()}\n</div>\n",
+      "type": "registry:ui",
+      "target": "$lib/components/card/CardContent.svelte"
+    },
+    {
+      "path": "blocks/card/CardDescription.svelte",
+      "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLParagraphElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<p class={cn('text-sm text-muted-foreground', className)} {...restProps}>\n\t{@render children?.()}\n</p>\n",
+      "type": "registry:ui",
+      "target": "$lib/components/card/CardDescription.svelte"
+    },
+    {
+      "path": "blocks/card/CardFooter.svelte",
+      "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLDivElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<div class={cn('flex items-center p-6 pt-0', className)} {...restProps}>\n\t{@render children?.()}\n</div>\n",
+      "type": "registry:ui",
+      "target": "$lib/components/card/CardFooter.svelte"
+    },
+    {
+      "path": "blocks/card/CardHeader.svelte",
+      "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLDivElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<div class={cn('flex flex-col space-y-1.5 p-6', className)} {...restProps}>\n\t{@render children?.()}\n</div>\n",
+      "type": "registry:ui",
+      "target": "$lib/components/card/CardHeader.svelte"
+    },
+    {
+      "path": "blocks/card/CardTitle.svelte",
+      "content": "<script lang=\"ts\">\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLAttributes } from 'svelte/elements';\n\timport { cn } from '$lib/utils';\n\n\tinterface Props extends HTMLAttributes<HTMLHeadingElement> {\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet { children, class: className, ...restProps }: Props = $props();\n</script>\n\n<h3 class={cn('font-semibold leading-none tracking-tight', className)} {...restProps}>\n\t{@render children?.()}\n</h3>\n",
+      "type": "registry:ui",
+      "target": "$lib/components/card/CardTitle.svelte"
+    },
+    {
+      "path": "blocks/card/index.ts",
+      "content": "export { default as Card } from './Card.svelte';\nexport { default as CardHeader } from './CardHeader.svelte';\nexport { default as CardContent } from './CardContent.svelte';\nexport { default as CardTitle } from './CardTitle.svelte';\nexport { default as CardDescription } from './CardDescription.svelte';\nexport { default as CardFooter } from './CardFooter.svelte';\n",
+      "type": "registry:lib",
+      "target": "$lib/components/card/index.ts"
+    }
+  ]
+}

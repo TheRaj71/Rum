@@ -1,0 +1,21 @@
+{
+  "name": "button",
+  "type": "registry:block",
+  "files": [
+    {
+      "path": "ui/button/Button.svelte",
+      "content": "<script lang=\"ts\">\n\timport { tv, type VariantProps } from 'tailwind-variants';\n\timport type { Snippet } from 'svelte';\n\timport type { HTMLButtonAttributes } from 'svelte/elements';\n\n\tconst buttonVariants = tv({\n\t\tbase: 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',\n\t\tvariants: {\n\t\t\tvariant: {\n\t\t\t\tdefault: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',\n\t\t\t\tdestructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',\n\t\t\t\toutline:\n\t\t\t\t\t'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',\n\t\t\t\tsecondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',\n\t\t\t\tghost: 'hover:bg-accent hover:text-accent-foreground',\n\t\t\t\tlink: 'text-primary underline-offset-4 hover:underline'\n\t\t\t},\n\t\t\tsize: {\n\t\t\t\tdefault: 'h-9 px-4 py-2',\n\t\t\t\tsm: 'h-8 rounded-md px-3 text-xs',\n\t\t\t\tlg: 'h-10 rounded-md px-8',\n\t\t\t\ticon: 'h-9 w-9'\n\t\t\t}\n\t\t},\n\t\tdefaultVariants: {\n\t\t\tvariant: 'default',\n\t\t\tsize: 'default'\n\t\t}\n\t});\n\n\ttype ButtonVariants = VariantProps<typeof buttonVariants>;\n\n\tinterface Props extends HTMLButtonAttributes {\n\t\tvariant?: ButtonVariants['variant'];\n\t\tsize?: ButtonVariants['size'];\n\t\tchildren?: Snippet;\n\t\tclass?: string;\n\t}\n\n\tlet {\n\t\tvariant = 'default',\n\t\tsize = 'default',\n\t\tchildren,\n\t\tclass: className,\n\t\t...restProps\n\t}: Props = $props();\n</script>\n\n<button class={buttonVariants({ variant, size, class: className })} {...restProps}>\n\t{@render children?.()}\n</button>\n",
+      "type": "registry:ui",
+      "target": "$lib/components/button/Button.svelte"
+    },
+    {
+      "path": "ui/button/index.ts",
+      "content": "export { default as Button } from './Button.svelte';\n",
+      "type": "registry:lib",
+      "target": "$lib/components/button/index.ts"
+    }
+  ],
+  "dependencies": [
+    "tailwind-variants"
+  ]
+}
