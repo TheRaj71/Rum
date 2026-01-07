@@ -124,8 +124,8 @@ async function fetchWithRetry(
         }
       }
 
-      // Return successful responses or client errors (4xx except 403 rate limit)
-      if (response.ok || (response.status >= 400 && response.status < 500)) {
+      // Return successful responses, 304 Not Modified, or client errors (4xx except 403 rate limit)
+      if (response.ok || response.status === 304 || (response.status >= 400 && response.status < 500)) {
         return response;
       }
 

@@ -58,7 +58,7 @@ export class InvalidProjectError extends Error {
  */
 export class TailwindNotFoundError extends Error {
 	constructor() {
-		super('Tailwind CSS configuration not found. Please set up Tailwind CSS first.');
+		super('Tailwind CSS configuration not found. Please set up Tailwind CSS first.\n  Run: npx sv add tailwindcss');
 		this.name = 'TailwindNotFoundError';
 	}
 }
@@ -296,45 +296,12 @@ export function detectPackageManager(cwd: string): 'npm' | 'yarn' | 'pnpm' | 'bu
 
 /**
  * Auto-installs Tailwind CSS using sv add tailwindcss
- * Uses the appropriate package manager runner (npx, bunx, pnpm dlx, yarn dlx)
+ * This is disabled by default since sv add requires interactive input
  */
 async function autoInstallTailwind(cwd: string, verbose: boolean): Promise<boolean> {
-	const packageManager = detectPackageManager(cwd);
-	
-	// Determine the correct runner command
-	let runnerCmd: string;
-	switch (packageManager) {
-		case 'bun':
-			runnerCmd = 'bunx';
-			break;
-		case 'pnpm':
-			runnerCmd = 'pnpm dlx';
-			break;
-		case 'yarn':
-			runnerCmd = 'yarn dlx';
-			break;
-		default:
-			runnerCmd = 'npx';
-	}
-	
-	const command = `${runnerCmd} sv add tailwindcss --no-git-check --install ${packageManager}`;
-	
-	if (verbose) {
-		console.log(pc.dim(`Installing Tailwind CSS with: ${command}`));
-	}
-	
-	try {
-		execSync(command, {
-			cwd,
-			stdio: verbose ? 'inherit' : 'pipe',
-		});
-		return true;
-	} catch (error) {
-		if (verbose) {
-			console.error(pc.red(`Failed to auto-install Tailwind: ${error instanceof Error ? error.message : String(error)}`));
-		}
-		return false;
-	}
+	// sv add tailwindcss is interactive and cannot be automated reliably
+	// Users must run it manually to select plugins
+	return false;
 }
 
 /**
@@ -346,7 +313,7 @@ async function autoInstallTailwind(cwd: string, verbose: boolean): Promise<boole
  * @throws TailwindNotFoundError if Tailwind config is not found and auto-install fails
  */
 export async function init(options: InitOptions): Promise<InitResult> {
-	const { cwd, style = 'default', force = false, verbose = false, registry, autoInstallTailwind: autoInstall = true } = options;
+	const { cwd, style = 'default', force = false, verbose = false, registry, autoInstallTailwind: autoInstall = false } = options;
 
 	// Requirement 4.1, 4.7: Detect svelte.config.js presence
 	const svelteConfigPath = detectSvelteConfig(cwd);
