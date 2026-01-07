@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/TheRaj71/Rum/main/assets/logo.png" alt="rum logo" width="1020" />
 </p>
 
-<h1 align="center">Rum</h1>
+<h1 align="center">Rumm</h1>
 
 <p align="center">
   <strong>A delightful CLI for Svelte 5 component registry</strong>
@@ -27,9 +27,9 @@
 
 ---
 
-## What is rum?
+## What is rumm?
 
-rum is a CLI tool that lets you add beautifully designed Svelte 5 components directly into your project. Unlike traditional component libraries, rum doesn't install packages — it copies the source code into your project, giving you full ownership and the freedom to customize everything.
+rumm is a CLI tool that lets you add beautifully designed Svelte 5 components directly into your project. Unlike traditional component libraries, rumm doesn't install packages — it copies the source code into your project, giving you full ownership and the freedom to customize everything.
 
 Inspired by [shadcn/ui](https://ui.shadcn.com), rum brings the same developer experience to the Svelte ecosystem with first-class support for:
 
@@ -38,9 +38,9 @@ Inspired by [shadcn/ui](https://ui.shadcn.com), rum brings the same developer ex
 - **TypeScript** - Full type safety out of the box
 - **Accessibility** - Components follow WAI-ARIA guidelines
 
-## Why rum?
+## Why rumm?
 
-**Own your components.** When you add a component with rum, you get the actual source code. No black-box dependencies, no version conflicts, no waiting for library updates.
+**Own your components.** When you add a component with rumm, you get the actual source code. No black-box dependencies, no version conflicts, no waiting for library updates.
 
 **Customize everything.** Every component is yours to modify. Change colors, add features, remove what you don't need — it's your code.
 
@@ -50,20 +50,20 @@ Inspired by [shadcn/ui](https://ui.shadcn.com), rum brings the same developer ex
 
 ## Installation
 
-rum works with any package manager. Install it globally or use it directly with `npx`/`pnpm dlx`:
+rumm works with any package manager. Install it globally or use it directly with `npx`/`pnpm dlx`:
 
 ```bash
 # Using pnpm (recommended)
-pnpm add -g rum
+pnpm add -g rumm
 
 # Using npm
-npm install -g rum
+npm install -g rumm
 
 # Using bun
-bun add -g rum
+bun add -g rumm
 
 # Or use without installing
-pnpm dlx rum add button
+pnpm dlx rumm add button
 ```
 
 ## Quick Start
@@ -73,7 +73,7 @@ pnpm dlx rum add button
 Navigate to your SvelteKit project and run:
 
 ```bash
-rum init
+rumm init
 ```
 
 This will:
@@ -86,15 +86,15 @@ This will:
 Add components by name from the official registry:
 
 ```bash
-rum add button
-rum add card
-rum add button card dialog  # Add multiple at once
+rumm add button
+rumm add card
+rumm add button card dialog  # Add multiple at once
 ```
 
 Or add from any URL:
 
 ```bash
-rum add https://example.com/r/datepicker.json
+rumm add https://example.com/r/datepicker.json
 ```
 
 ### 3. Use in your app
@@ -119,12 +119,12 @@ That's it! The components are now part of your project.
 
 ## Commands
 
-### `rum init`
+### `rumm init`
 
-Initialize your SvelteKit project for rum.
+Initialize your SvelteKit project for rumm.
 
 ```bash
-rum init [options]
+rumm init [options]
 
 Options:
   -c, --cwd <path>      Working directory (default: current directory)
@@ -139,12 +139,12 @@ Options:
 - Adds the `cn()` helper for class merging
 - Injects CSS variables for theming
 
-### `rum add`
+### `rumm add`
 
 Add components to your project.
 
 ```bash
-rum add <components...> [options]
+rumm add <components...> [options]
 
 Arguments:
   components    Component names or URLs to add
@@ -161,26 +161,26 @@ Options:
 
 ```bash
 # Add a single component
-rum add button
+rumm add button
 
 # Add multiple components
-rum add button card dialog tooltip
+rumm add button card dialog tooltip
 
 # Add from a URL
-rum add https://acme.dev/r/auth-form.json
+rumm add https://acme.dev/r/auth-form.json
 
 # Add with auto-overwrite
-rum add button --overwrite
+rumm add button --overwrite
 ```
 
-**Auto-initialization:** If you haven't run `rum init`, the `add` command will automatically initialize your project when you add your first component.
+**Auto-initialization:** If you haven't run `rumm init`, the `add` command will automatically initialize your project when you add your first component.
 
-### `rum build`
+### `rumm build`
 
 Build your component registry from source files.
 
 ```bash
-rum build [options]
+rumm build [options]
 
 Options:
   -c, --cwd <path>       Working directory
@@ -198,12 +198,12 @@ Options:
 - Generates JSON files for each component
 - Creates a `registry.json` index
 
-### `rum serve`
+### `rumm serve`
 
 Start a local server to test your registry.
 
 ```bash
-rum serve [options]
+rumm serve [options]
 
 Options:
   -c, --cwd <path>    Working directory
@@ -216,16 +216,16 @@ Perfect for testing your registry locally before deploying:
 
 ```bash
 # In your registry project
-rum build
-rum serve
+rumm build
+rumm serve
 
 # In another project
-rum add http://localhost:5555/button.json
+rumm add http://localhost:5555/button.json
 ```
 
 ## Configuration
 
-rum uses a `components.json` file in your project root:
+rumm uses a `components.json` file in your project root:
 
 ```json
 {
@@ -270,7 +270,7 @@ You can configure multiple registries:
 Then specify which registry to use:
 
 ```bash
-rum add button -r acme
+rumm add button -r acme
 ```
 
 ## Creating Components
@@ -349,13 +349,13 @@ my-registry/
 
 ```bash
 # Build the registry
-rum build
+rumm build
 
 # Start local server for testing
-rum serve
+rumm serve
 
 # Test in another project
-rum add http://localhost:5555/button.json
+rumm add http://localhost:5555/button.json
 ```
 
 ### Component Metadata
@@ -412,7 +412,7 @@ Point your domain to any of the above services:
 
 ## Package Manager Support
 
-rum works with all major package managers:
+rumm works with all major package managers:
 
 | Package Manager | Lock File | Install Command |
 |----------------|-----------|-----------------|
@@ -421,11 +421,11 @@ rum works with all major package managers:
 | yarn | `yarn.lock` | `yarn add` |
 | bun | `bun.lockb` | `bun add` |
 
-rum automatically detects your package manager and uses the correct install command.
+rumm automatically detects your package manager and uses the correct install command.
 
 ## Tailwind CSS Support
 
-rum supports both Tailwind CSS v3 and v4:
+rumm supports both Tailwind CSS v3 and v4:
 
 **Tailwind v3** - Detected via `tailwind.config.ts` or `tailwind.config.js`
 

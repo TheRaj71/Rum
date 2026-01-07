@@ -96,9 +96,13 @@ describe('add command', () => {
 			writeFileSync(join(testDir, 'components.json'), JSON.stringify(config, null, 2));
 		});
 
-		it('should throw ConfigNotFoundError when components.json is missing', async () => {
-			// Remove components.json
+		it('should throw error when not a SvelteKit project (no svelte.config)', async () => {
+			// Remove components.json - auto-init will try but fail without svelte.config
 			rmSync(join(testDir, 'components.json'));
+			// Also remove svelte.config.js if it exists
+			if (existsSync(join(testDir, 'svelte.config.js'))) {
+				rmSync(join(testDir, 'svelte.config.js'));
+			}
 
 			await expect(
 				add({
@@ -106,7 +110,7 @@ describe('add command', () => {
 					components: ['button'],
 					skipInstall: true,
 				})
-			).rejects.toThrow('components.json not found');
+			).rejects.toThrow('Not a SvelteKit project');
 		});
 
 		it('should handle component not found error gracefully', async () => {

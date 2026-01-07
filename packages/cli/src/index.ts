@@ -17,20 +17,20 @@ import { ConfigNotFoundError } from './utils/config.js';
 import { CircularDependencyError, ComponentNotFoundError } from './utils/resolver.js';
 
 /**
- * rum - A delightful CLI for Svelte 5 component registry
+ * rumm - A delightful CLI for Svelte 5 component registry
  * Ship beautiful components with ease 🍹
  */
 
 const LOGO = `
-${pc.magenta('  ╭───────────────────────────╮')}
-${pc.magenta('  │')}  ${pc.bold(pc.cyan('rum'))} ${pc.dim('- svelte registry')}   ${pc.magenta('│')}
-${pc.magenta('  │')}  ${pc.dim('ship components with ease')} ${pc.magenta('│')}
-${pc.magenta('  ╰───────────────────────────╯')}
+${pc.magenta('  ╭────────────────────────────╮')}
+${pc.magenta('  │')}  ${pc.bold(pc.cyan('rumm'))} ${pc.dim('- svelte registry')}   ${pc.magenta('│')}
+${pc.magenta('  │')}  ${pc.dim('ship components with ease')}  ${pc.magenta('│')}
+${pc.magenta('  ╰────────────────────────────╯')}
 `;
 
 const program = new Command()
-	.name('rum')
-	.description('rum - A delightful CLI for Svelte 5 component registry 🍹')
+	.name('rumm')
+	.description('rumm - A delightful CLI for Svelte 5 component registry 🍹')
 	.version('1.0.0')
 	.helpOption('-h, --help', 'Display help for command')
 	.addHelpCommand('help [command]', 'Display help for command')
@@ -46,7 +46,7 @@ const program = new Command()
  * Initializes a SvelteKit project for the component registry
  */
 const initCommand = new Command('init')
-	.description('Initialize your SvelteKit project for rum')
+	.description('Initialize your SvelteKit project for rumm')
 	.option('-c, --cwd <path>', 'Working directory', process.cwd())
 	.option('-s, --style <style>', 'Style/theme to use', 'default')
 	.option('-f, --force', 'Force overwrite existing files', false)
@@ -100,9 +100,9 @@ function isUrl(str: string): boolean {
  * Adds components from the registry to your project
  * 
  * Usage:
- *   rum add button                              - Add from configured registry
- *   rum add https://example.com/r/button.json   - Add from URL directly (fetches component JSON)
- *   rum add button card                         - Add multiple components
+ *   rumm add button                              - Add from configured registry
+ *   rumm add https://example.com/r/button.json   - Add from URL directly (fetches component JSON)
+ *   rumm add button card                         - Add multiple components
  * 
  * Like shadcn, URLs point directly to component JSON files, not registry.json
  */
@@ -331,6 +331,6 @@ export { ConfigNotFoundError } from './utils/config.js';
 export { CircularDependencyError, ComponentNotFoundError } from './utils/resolver.js';
 
 // Only parse when run directly
-if (process.argv[1]?.includes('rum') || process.argv[1]?.endsWith('index.js')) {
+if (process.argv[1]?.includes('rumm') || process.argv[1]?.endsWith('index.js')) {
 	program.parse();
 }

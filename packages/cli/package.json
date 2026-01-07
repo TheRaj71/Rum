@@ -1,10 +1,10 @@
 {
-  "name": "rum",
-  "version": "1.0.0",
-  "description": "rum - A delightful CLI for Svelte 5 component registry. Ship beautiful components with ease.",
+  "name": "rumm",
+  "version": "1.0.1",
+  "description": "rumm - A delightful CLI for Svelte 5 component registry. Ship beautiful components with ease.",
   "type": "module",
   "bin": {
-    "rum": "./dist/index.js"
+    "rumm": "./dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -23,7 +23,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "keywords": [
     "svelte",
@@ -36,7 +37,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/svelte-registry"
+    "url": "https://github.com/TheRaj71/Rum"
+  },
+  "homepage": "https://github.com/TheRaj71/Rum#readme",
+  "bugs": {
+    "url": "https://github.com/TheRaj71/Rum/issues"
   },
   "license": "MIT",
   "scripts": {
