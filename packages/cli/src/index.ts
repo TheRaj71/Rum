@@ -2,19 +2,17 @@ import { Command } from 'commander';
 import pc from 'picocolors';
 import ora from 'ora';
 import {
-	init,
-	printInitSummary,
-	InvalidProjectError,
-	TailwindNotFoundError,
-	add,
-	build,
-	printBuildSummary,
-	BuildValidationError,
-	serve,
-	printServeInfo,
+init,
+printInitSummary,
+InvalidProjectError,
+TailwindNotFoundError,
+add,
+build,
+BuildValidationError,
+serve,
+printServeInfo,
 } from './commands/index.js';
-import { ConfigNotFoundError } from './utils/config.js';
-import { CircularDependencyError, ComponentNotFoundError } from './utils/resolver.js';
+import { ComponentNotFoundError } from './utils/resolver.js';
 
 /**
  * rumm - A delightful CLI for Svelte 5 component registry
@@ -62,9 +60,9 @@ const initCommand = new Command('init')
 				verbose: options.verbose,
 			});
 
-			spinner.succeed(pc.green('Project initialized!'));
-			printInitSummary(result);
-		} catch (error) {
+spinner.succeed(pc.green('Project initialized!'));
+printInitSummary(result, options.cwd);
+} catch (error) {
 			spinner.fail(pc.red('Initialization failed'));
 			
 			if (error instanceof InvalidProjectError) {

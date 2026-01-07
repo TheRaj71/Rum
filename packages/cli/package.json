@@ -1,6 +1,6 @@
 {
   "name": "rumm",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "rumm - A delightful CLI for Svelte 5 component registry. Ship beautiful components with ease.",
   "type": "module",
   "bin": {

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { execSync } from 'node:child_process';
 import pc from 'picocolors';
 import type { ComponentConfig, CssVars } from '../schema/index.js';
 import { mergeCssVariables } from '../utils/css.js';
@@ -20,6 +21,8 @@ export interface InitOptions {
 	verbose?: boolean;
 	/** Default registry URL */
 	registry?: string;
+	/** Auto-install Tailwind if not found */
+	autoInstallTailwind?: boolean;
 }
 
 export interface InitResult {
@@ -161,8 +164,9 @@ export function detectTailwindConfig(cwd: string): string | null {
 
 	// Tailwind v4 CSS-based config detection
 	// Check common CSS files for @import 'tailwindcss' or @tailwind directives
+	// sv add tailwindcss creates src/routes/layout.css for SvelteKit
 	const v4CssPaths = [
-		join(cwd, 'src', 'routes', 'layout.css'),
+		join(cwd, 'src', 'routes', 'layout.css'),  // sv add tailwindcss default
 		join(cwd, 'src', 'app.css'),
 		join(cwd, 'src', 'global.css'),
 		join(cwd, 'src', 'styles', 'app.css'),
@@ -204,6 +208,7 @@ export function detectTailwindConfig(cwd: string): string | null {
  */
 export function detectCssFile(cwd: string): string {
 	const possiblePaths = [
+		join(cwd, 'src', 'routes', 'layout.css'),  // sv add tailwindcss default for v4
 		join(cwd, 'src', 'app.css'),
 		join(cwd, 'src', 'global.css'),
 		join(cwd, 'src', 'styles', 'app.css'),
@@ -265,15 +270,87 @@ function ensureDir(dirPath: string): void {
 }
 
 /**
+ * Detects the package manager used in the project
+ */
+export function detectPackageManager(cwd: string): 'npm' | 'yarn' | 'pnpm' | 'bun' {
+	let currentDir = cwd;
+	const root = '/';
+	
+	while (currentDir !== root) {
+		if (existsSync(join(currentDir, 'bun.lockb')) || existsSync(join(currentDir, 'bun.lock'))) {
+			return 'bun';
+		}
+		if (existsSync(join(currentDir, 'pnpm-lock.yaml'))) {
+			return 'pnpm';
+		}
+		if (existsSync(join(currentDir, 'yarn.lock'))) {
+			return 'yarn';
+		}
+		if (existsSync(join(currentDir, 'package-lock.json'))) {
+			return 'npm';
+		}
+		
+		const parentDir = dirname(currentDir);
+		if (parentDir === currentDir) break;
+		currentDir = parentDir;
+	}
+	
+	return 'npm';
+}
+
+/**
+ * Auto-installs Tailwind CSS using sv add tailwindcss
+ * Uses the appropriate package manager runner (npx, bunx, pnpm dlx, yarn dlx)
+ */
+async function autoInstallTailwind(cwd: string, verbose: boolean): Promise<boolean> {
+	const packageManager = detectPackageManager(cwd);
+	
+	// Determine the correct runner command
+	let runnerCmd: string;
+	switch (packageManager) {
+		case 'bun':
+			runnerCmd = 'bunx';
+			break;
+		case 'pnpm':
+			runnerCmd = 'pnpm dlx';
+			break;
+		case 'yarn':
+			runnerCmd = 'yarn dlx';
+			break;
+		default:
+			runnerCmd = 'npx';
+	}
+	
+	const command = `${runnerCmd} sv add tailwindcss --no-git-check --install ${packageManager}`;
+	
+	if (verbose) {
+		console.log(pc.dim(`Installing Tailwind CSS with: ${command}`));
+	}
+	
+	try {
+		execSync(command, {
+			cwd,
+			stdio: verbose ? 'inherit' : 'pipe',
+		});
+		return true;
+	} catch (error) {
+		if (verbose) {
+			console.error(pc.red(`Failed to auto-install Tailwind: ${error instanceof Error ? error.message : String(error)}`));
+		}
+		return false;
+	}
+}
+
+/**
  * Initializes a SvelteKit project for the component registry
  *
  * @param options - Init options
  * @returns Init result with paths to created files
  * @throws InvalidProjectError if svelte.config.js is not found
- * @throws TailwindNotFoundError if Tailwind config is not found
+ * @throws TailwindNotFoundError if Tailwind config is not found and auto-install fails
  */
 export async function init(options: InitOptions): Promise<InitResult> {
-	const { cwd, style = 'default', force = false, verbose = false, registry } = options;
+	const { cwd, style = 'default', force = false, verbose = false, registry, autoInstallTailwind: autoInstall = true } = options;
 
 	// Requirement 4.1, 4.7: Detect svelte.config.js presence
 	const svelteConfigPath = detectSvelteConfig(cwd);
@@ -286,7 +363,25 @@ export async function init(options: InitOptions): Promise<InitResult> {
 	}
 
 	// Requirement 4.2: Detect tailwind.config.ts/js presence (or Tailwind v4 CSS-based)
-	const tailwindConfigPath = detectTailwindConfig(cwd);
+	let tailwindConfigPath = detectTailwindConfig(cwd);
+	
+	// Auto-install Tailwind if not found
+	if (!tailwindConfigPath && autoInstall) {
+		if (verbose) {
+			console.log(pc.yellow(`Tailwind CSS not found, installing automatically...`));
+		}
+		
+		const installed = await autoInstallTailwind(cwd, verbose);
+		
+		if (installed) {
+			// Re-detect after installation
+			tailwindConfigPath = detectTailwindConfig(cwd);
+			if (verbose && tailwindConfigPath) {
+				console.log(pc.green(`Tailwind CSS installed successfully!`));
+			}
+		}
+	}
+	
 	if (!tailwindConfigPath) {
 		throw new TailwindNotFoundError();
 	}
@@ -389,6 +484,56 @@ export async function init(options: InitOptions): Promise<InitResult> {
 		console.log(pc.yellow(`CSS variables already exist in ${cssPathRelative}`));
 	}
 
+	// Auto-install required dependencies (clsx, tailwind-merge)
+	const packageManager = detectPackageManager(cwd);
+	const packageJsonPath = join(cwd, 'package.json');
+	
+	if (existsSync(packageJsonPath)) {
+		try {
+			const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+			const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
+			
+			const missingDeps: string[] = [];
+			if (!deps['clsx']) missingDeps.push('clsx');
+			if (!deps['tailwind-merge']) missingDeps.push('tailwind-merge');
+			
+			if (missingDeps.length > 0) {
+				if (verbose) {
+					console.log(pc.dim(`Installing dependencies: ${missingDeps.join(', ')}`));
+				}
+				
+				let installCmd: string;
+				switch (packageManager) {
+					case 'bun':
+						installCmd = `bun add ${missingDeps.join(' ')}`;
+						break;
+					case 'pnpm':
+						installCmd = `pnpm add ${missingDeps.join(' ')}`;
+						break;
+					case 'yarn':
+						installCmd = `yarn add ${missingDeps.join(' ')}`;
+						break;
+					default:
+						installCmd = `npm install ${missingDeps.join(' ')}`;
+				}
+				
+				try {
+					execSync(installCmd, {
+						cwd,
+						stdio: verbose ? 'inherit' : 'pipe',
+					});
+				} catch {
+					// Don't fail if deps install fails, just warn
+					if (verbose) {
+						console.log(pc.yellow(`Warning: Failed to install dependencies. Run manually: ${installCmd}`));
+					}
+				}
+			}
+		} catch {
+			// Ignore package.json read errors
+		}
+	}
+
 	return {
 		configPath,
 		utilsPath,
@@ -400,26 +545,60 @@ export async function init(options: InitOptions): Promise<InitResult> {
 /**
  * Prints a summary of the init operation
  */
-export function printInitSummary(result: InitResult): void {
-	console.log();
-	console.log(pc.green('✓ Project initialized successfully!'));
-	console.log();
+export function printInitSummary(result: InitResult, cwd: string): void {
+const packageManager = detectPackageManager(cwd);
 
-	if (result.created.config) {
-		console.log(`  ${pc.cyan('components.json')} - Configuration file created`);
-	}
-	if (result.created.utils) {
-		console.log(`  ${pc.cyan('src/lib/utils.ts')} - cn() helper created`);
-	}
-	if (result.created.css) {
-		console.log(`  ${pc.cyan('app.css')} - CSS variables injected`);
-	}
+// Determine the correct add command based on package manager
+let addCommand: string;
+switch (packageManager) {
+case 'bun':
+addCommand = 'bun add';
+break;
+case 'pnpm':
+addCommand = 'pnpm add';
+break;
+case 'yarn':
+addCommand = 'yarn add';
+break;
+default:
+addCommand = 'npm install';
+}
 
-	console.log();
-	console.log(pc.dim('Next steps:'));
-	console.log(pc.dim('  1. Install required dependencies:'));
-	console.log(pc.dim('     pnpm add clsx tailwind-merge'));
-	console.log(pc.dim('  2. Add components:'));
-	console.log(pc.dim('     npx svelte-registry add button'));
-	console.log();
+// Determine the correct runner command for the registry CLI
+let runnerCommand: string;
+switch (packageManager) {
+case 'bun':
+runnerCommand = 'bunx';
+break;
+case 'pnpm':
+runnerCommand = 'pnpm dlx';
+break;
+case 'yarn':
+runnerCommand = 'yarn dlx';
+break;
+default:
+runnerCommand = 'npx';
+}
+
+console.log();
+console.log(pc.green('✓ Project initialized successfully!'));
+console.log();
+
+if (result.created.config) {
+console.log(`  ${pc.cyan('components.json')} - Configuration file created`);
+}
+if (result.created.utils) {
+console.log(`  ${pc.cyan('src/lib/utils.ts')} - cn() helper created`);
+}
+if (result.created.css) {
+console.log(`  ${pc.cyan('app.css')} - CSS variables injected`);
+}
+
+console.log();
+console.log(pc.dim('Next steps:'));
+console.log(pc.dim('  1. Install required dependencies:'));
+console.log(pc.dim(`     ${addCommand} clsx tailwind-merge`));
+console.log(pc.dim('  2. Add components:'));
+console.log(pc.dim(`     ${runnerCommand} svelte-registry add button`));
+console.log();
 }
