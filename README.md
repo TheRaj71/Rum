@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TheRaj71/Rum/main/assets/rum.png" alt="rum logo" width="120" />
+  <img src="https://raw.githubusercontent.com/TheRaj71/Rum/main/assets/logo.png" alt="rum logo" width="120" />
 </p>
 
 <h1 align="center">rum</h1>
