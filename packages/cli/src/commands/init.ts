@@ -229,35 +229,31 @@ export function detectCssFile(cwd: string): string {
  * Creates the default components.json configuration
  */
 export function createDefaultConfig(options: {
-	style: string;
-	tailwindConfig: string;
-	cssPath: string;
-	registry?: string;
+style: string;
+tailwindConfig: string;
+cssPath: string;
+registry?: string;
 }): ComponentConfig {
-	const config: ComponentConfig = {
-		$schema: 'https://rum.dev/schema/config.json',
-		style: options.style,
-		tailwind: {
-			config: options.tailwindConfig,
-			css: options.cssPath,
-			baseColor: 'slate',
-		},
-		aliases: {
-			components: '$lib/components',
-			utils: '$lib/utils',
-			hooks: '$lib/hooks',
-			lib: '$lib',
-		},
-	};
-	
-	// Add registry if provided
-	if (options.registry) {
-		config.registries = {
-			default: options.registry,
-		};
-	}
-	
-	return config;
+const config: ComponentConfig = {
+$schema: 'https://rum.dev/schema/config.json',
+style: options.style,
+tailwind: {
+config: options.tailwindConfig,
+css: options.cssPath,
+baseColor: 'slate',
+},
+aliases: {
+components: '$lib/components',
+utils: '$lib/utils',
+hooks: '$lib/hooks',
+lib: '$lib',
+},
+registries: {
+default: options.registry || 'https://rumcli.pages.dev/r',
+},
+};
+
+return config;
 }
 
 /**
@@ -598,7 +594,9 @@ console.log();
 console.log(pc.dim('Next steps:'));
 console.log(pc.dim('  1. Install required dependencies:'));
 console.log(pc.dim(`     ${addCommand} clsx tailwind-merge`));
-console.log(pc.dim('  2. Add components:'));
-console.log(pc.dim(`     ${runnerCommand} svelte-registry add button`));
+console.log(pc.dim('  2. Add components from registry:'));
+console.log(pc.dim(`     ${runnerCommand} rumm add button`));
+console.log(pc.dim('  3. Or add from custom URL:'));
+console.log(pc.dim(`     ${runnerCommand} rumm add https://example.com/r/button.json`));
 console.log();
 }
