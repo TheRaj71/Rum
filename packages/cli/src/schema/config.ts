@@ -45,7 +45,9 @@ export const ComponentConfigSchema = z.object({
   style: z.string().default('default'),
   tailwind: TailwindConfigSchema,
   aliases: AliasesSchema,
-  registries: z.record(RegistryConfigSchema).optional(),
+  registries: z.record(RegistryConfigSchema).default({
+    default: 'https://rumcli.pages.dev/r/registry.json',
+  }),
 });
 
 // Type exports

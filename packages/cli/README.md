@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/TheRaj71/Rum/main/assets/logo.png" alt="rumm logo" width="1050" />
 </p>
 
-<h1 align="center">Rumm</h1>
+<h1 align="center">Rumm CLI</h1>
 
 <p align="center">
   <strong>A delightful CLI for Svelte 5 component registry</strong>
@@ -33,21 +33,20 @@ Inspired by [shadcn/ui](https://ui.shadcn.com), rumm brings the same developer e
 
 ## Installation
 
+rumm works with any package manager. Install it globally or use it directly with `npx`/`pnpm dlx`:
+
 ```bash
+# Using pnpm (recommended)
+pnpm add -g rumm
+
 # Using npm
 npm install -g rumm
-
-# Using pnpm
-pnpm add -g rumm
 
 # Using bun
 bun add -g rumm
 
-# Using yarn
-yarn global add rumm
-
 # Or use without installing
-npx rumm add button
+pnpm dlx rumm add button
 ```
 
 ## Quick Start
@@ -61,9 +60,10 @@ rumm init
 ```
 
 This will:
+- Detect your Svelte and Tailwind configuration (supports Tailwind v3 and v4)
 - Create a `components.json` configuration file
 - Add the `cn()` utility function to `src/lib/utils.ts`
-- Inject CSS variables into your stylesheet
+- Inject CSS variables into your stylesheet (e.g., `src/app.css` or `src/routes/layout.css`)
 
 ### 2. Add components
 
@@ -99,6 +99,8 @@ rumm add https://example.com/r/datepicker.json
 </Card>
 ```
 
+---
+
 ## Commands
 
 ### `rumm init`
@@ -113,7 +115,15 @@ Options:
   -s, --style <style>   Style/theme to use (default: "default")
   -f, --force           Force overwrite existing files
   -v, --verbose         Show verbose output
+  --registry <url>      Default registry URL
 ```
+
+**What it does:**
+- Detects `svelte.config.js` and Tailwind configuration.
+- **Auto-installs Tailwind CSS** if not found (using `sv add tailwindcss`).
+- Creates `components.json` with sensible defaults based on your project structure.
+- Adds the `cn()` helper for merging Tailwind classes safely.
+- Injects a set of standard CSS variables for theming into your main CSS file.
 
 ### `rumm add`
 
@@ -123,7 +133,7 @@ Add components to your project.
 rumm add <components...> [options]
 
 Arguments:
-  components    Component names or URLs to add
+  components    Component names, URLs, or namespaced references (e.g., @acme/button)
 
 Options:
   -c, --cwd <path>          Working directory
@@ -131,27 +141,23 @@ Options:
   -r, --registry <name>     Use a specific registry from your config
   -v, --verbose             Show verbose output
   --skip-install            Skip npm dependency installation
+  --yes                     Skip confirmation prompts
 ```
 
-**Examples:**
+**Smart Resolution:**
+Rumm uses a sophisticated resolution system to find components:
+1. **Direct URL**: If it starts with `http`, it fetches the JSON directly.
+2. **Namespaced**: `@myorg/button` searches only the registry named `myorg` in your config.
+3. **Name-based**: Searches all configured registries in order.
+4. **Typo Suggestions**: If a component isn't found, rumm suggests similar names using Levenshtein distance.
+5. **Multiple Matches**: If a component exists in multiple registries, rumm prompts you to choose one.
 
-```bash
-# Add a single component
-rumm add button
-
-# Add multiple components
-rumm add button card dialog tooltip
-
-# Add from a URL
-rumm add https://acme.dev/r/auth-form.json
-
-# Add with auto-overwrite
-rumm add button --overwrite
-```
+**Clean Installation:**
+Components are installed to clean paths like `$lib/components/button/` instead of nested paths like `$lib/components/default/ui/button/`. Rumm automatically transforms imports within the source code to match your project's aliases.
 
 ### `rumm build`
 
-Build your component registry from source files.
+Build your component registry from source files. Ideal for hosting your own component library.
 
 ```bash
 rumm build [options]
@@ -166,9 +172,16 @@ Options:
   --dry-run              Validate without writing files
 ```
 
+**Key Features:**
+- **Auto-Discovery**: Recursively scans your source directory.
+- **Metadata Extraction**: Parses JSDoc or HTML comments for `@name`, `@description`, `@dependencies`, etc.
+- **Dependency Detection**: Automatically detects npm packages used in your components.
+- **Content Hashing**: Generates SHA-256 hashes for each component for reliable change detection.
+- **Registry Index**: Generates a `registry.json` index and individual `{name}.json` files for each component.
+
 ### `rumm serve`
 
-Start a local server to test your registry.
+Start a local server to test your registry during development.
 
 ```bash
 rumm serve [options]
@@ -180,9 +193,18 @@ Options:
   -v, --verbose       Show verbose output
 ```
 
+This allows you to test your registry in another project by adding it to `components.json`:
+```json
+"registries": {
+  "local": "http://localhost:5555/registry.json"
+}
+```
+
+---
+
 ## Configuration
 
-rumm uses a `components.json` file in your project root:
+Rumm uses a `components.json` file in your project root to manage settings:
 
 ```json
 {
@@ -200,25 +222,57 @@ rumm uses a `components.json` file in your project root:
     "lib": "$lib"
   },
   "registries": {
-    "default": "https://rum.dev/r/registry.json"
+    "default": "https://rumcli.pages.dev/r/registry.json"
   }
 }
 ```
 
-## Package Manager Support
+### Multiple Registries & Authentication
 
-rumm works with all major package managers:
+You can configure multiple registries and even include custom headers for private registries:
 
-| Package Manager | Install Command |
-|----------------|-----------------|
-| npm | `npm install -g rumm` |
-| pnpm | `pnpm add -g rumm` |
-| yarn | `yarn global add rumm` |
-| bun | `bun add -g rumm` |
+```json
+{
+  "registries": {
+    "default": "https://rum.dev/r/registry.json",
+    "acme": {
+      "url": "https://registry.acme.com/r/registry.json",
+      "headers": {
+        "Authorization": "Bearer ${AUTH_TOKEN}"
+      }
+    },
+    "template": "https://cdn.example.com/{name}.json"
+  }
+}
+```
 
-## Documentation
+---
 
-For full documentation, visit the [GitHub repository](https://github.com/TheRaj71/Rum).
+## Technical Details
+
+### Smart Path Aliases
+Rumm supports standard SvelteKit aliases and custom ones defined in your `components.json`. When adding a component, it dynamically transforms imports like `@/registry/ui/button` into your local component path, e.g., `$lib/components/button`.
+
+### CSS Variable Injection
+The `init` and `add` commands can automatically merge CSS variables into your project's main CSS file. This ensures that themes and component-specific styles work out of the box without manual configuration.
+
+### Package Manager Detection
+Rumm automatically detects whether you are using `npm`, `pnpm`, `yarn`, or `bun` by looking for lock files in your project and its parent directories (supporting monorepos).
+
+---
+
+## Troubleshooting
+
+### "Component not found"
+- Check if the registry URL in `components.json` is correct.
+- If using a private registry, ensure your headers are correctly configured.
+- Try running with `--verbose` to see exactly where rumm is looking.
+
+### Tailwind CSS issues
+- If styles aren't applying, ensure your CSS file (e.g., `src/app.css`) is imported in your root `+layout.svelte`.
+- For Tailwind v4, ensure you have `@import "tailwindcss";` at the top of your CSS file.
+
+---
 
 ## License
 

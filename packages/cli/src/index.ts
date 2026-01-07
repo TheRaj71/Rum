@@ -49,19 +49,21 @@ const initCommand = new Command('init')
 	.option('-s, --style <style>', 'Style/theme to use', 'default')
 	.option('-f, --force', 'Force overwrite existing files', false)
 	.option('-v, --verbose', 'Show verbose output', false)
+	.option('--auto-install-tailwind', 'Auto-install Tailwind CSS if missing', true)
 	.action(async (options) => {
 		const spinner = ora({ text: 'Initializing project...', spinner: 'dots' }).start();
-		
+
 		try {
 			const result = await init({
 				cwd: options.cwd,
 				style: options.style,
 				force: options.force,
 				verbose: options.verbose,
+				autoInstallTailwind: options.autoInstallTailwind,
 			});
 
-spinner.succeed(pc.green('Project initialized!'));
-printInitSummary(result, options.cwd);
+			spinner.succeed(pc.green('Project initialized!'));
+			printInitSummary(result, options.cwd);
 } catch (error) {
 			spinner.fail(pc.red('Initialization failed'));
 			

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://rum.dev/schema/config.json",
+  "$schema": "https://rum.dev/schema.config.json",
   "style": "default",
   "tailwind": {
     "config": "",
@@ -11,5 +11,8 @@
     "utils": "$lib/utils",
     "hooks": "$lib/hooks",
     "lib": "$lib"
+  },
+  "registries": {
+    "default": "http://localhost:5555/registry.json"
   }
 }

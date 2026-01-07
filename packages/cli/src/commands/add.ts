@@ -391,11 +391,26 @@ export async function add(options: AddOptions): Promise<AddResult> {
 			// Check for Tailwind
 			const tailwindConfig = detectTailwindConfig(cwd);
 			if (!tailwindConfig) {
-				throw new Error('Tailwind CSS not found. Please set up Tailwind CSS first: npx svelte-add@latest tailwind');
+				// shadcn-style: Prompt user to install Tailwind CSS
+				if (verbose) {
+					console.log(pc.yellow(`Tailwind CSS not found.`));
+				}
+
+				const shouldInstall = await promptFn(
+					`Would you like to set up Tailwind CSS now?`,
+					true
+				);
+
+				if (shouldInstall) {
+					if (verbose) {
+						console.log(pc.dim(`Installing Tailwind CSS...`));
+					}
+					// Run init with auto-install enabled
+					await init({ cwd, verbose, autoInstallTailwind: true });
+				} else {
+					throw new Error('Tailwind CSS is required to use rumm. Please set it up manually or re-run with auto-install enabled.');
+				}
 			}
-			
-			// Run init
-			await init({ cwd, verbose });
 			
 			// Load the newly created config
 			config = loadConfig(cwd);

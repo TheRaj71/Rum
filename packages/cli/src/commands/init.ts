@@ -248,9 +248,9 @@ utils: '$lib/utils',
 hooks: '$lib/hooks',
 lib: '$lib',
 },
-registries: {
-default: options.registry || 'https://rumcli.pages.dev/r',
-},
+		registries: {
+			default: options.registry || 'https://rumcli.pages.dev/r/registry.json',
+		},
 };
 
 return config;
