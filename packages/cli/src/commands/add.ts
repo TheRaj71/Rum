@@ -144,8 +144,6 @@ function resolveTargetPath(
 ): string {
 	let resolvedPath = target;
 
-	// Replace alias patterns with actual paths
-	// Common patterns: $lib/components, $lib/utils, $lib/hooks
 	const aliasMap: Record<string, string> = {
 		'$lib/components': config.aliases.components,
 		'$lib/utils': config.aliases.utils,
@@ -153,7 +151,6 @@ function resolveTargetPath(
 		'$lib': config.aliases.lib || '$lib',
 	};
 
-	// Sort by length (longest first) to match more specific aliases first
 	const sortedAliases = Object.entries(aliasMap).sort(
 		([a], [b]) => b.length - a.length
 	);
@@ -165,7 +162,6 @@ function resolveTargetPath(
 		}
 	}
 
-	// Convert $lib to actual path (src/lib)
 	resolvedPath = resolvedPath.replace(/^\$lib/, 'src/lib');
 
 	return join(cwd, resolvedPath);

@@ -21,7 +21,7 @@ export interface InitOptions {
 	verbose?: boolean;
 	/** Default registry URL */
 	registry?: string;
-	/** Auto-install Tailwind if not found */
+	/** Prompt to install Tailwind if not found (interactive) */
 	autoInstallTailwind?: boolean;
 }
 
@@ -295,13 +295,56 @@ export function detectPackageManager(cwd: string): 'npm' | 'yarn' | 'pnpm' | 'bu
 }
 
 /**
- * Auto-installs Tailwind CSS using sv add tailwindcss
- * This is disabled by default since sv add requires interactive input
+ * Prompts user and runs sv add tailwindcss interactively
+ * This allows the user to select plugins through the interactive prompt
  */
-async function autoInstallTailwind(cwd: string, verbose: boolean): Promise<boolean> {
-	// sv add tailwindcss is interactive and cannot be automated reliably
-	// Users must run it manually to select plugins
-	return false;
+async function promptAndInstallTailwind(cwd: string, verbose: boolean): Promise<boolean> {
+	const packageManager = detectPackageManager(cwd);
+	
+	let runnerCmd: string;
+	switch (packageManager) {
+		case 'bun':
+			runnerCmd = 'bunx';
+			break;
+		case 'pnpm':
+			runnerCmd = 'pnpm dlx';
+			break;
+		case 'yarn':
+			runnerCmd = 'yarn dlx';
+			break;
+		default:
+			runnerCmd = 'npx';
+	}
+	
+	const command = `${runnerCmd} sv add tailwindcss`;
+	
+	console.log();
+	console.log(pc.yellow('⚠ Tailwind CSS is not installed in this project.'));
+	console.log(pc.dim('  Rumm requires Tailwind CSS to function properly.'));
+	console.log();
+	console.log(pc.cyan(`Running: ${command}`));
+	console.log(pc.dim('  (You will be prompted to select Tailwind plugins)'));
+	console.log();
+	
+	try {
+		execSync(command, {
+			cwd,
+			stdio: 'inherit',
+		});
+		
+		console.log();
+		console.log(pc.green('✓ Tailwind CSS installed successfully!'));
+		console.log();
+		
+		return true;
+	} catch (error) {
+		console.log();
+		console.log(pc.red('✗ Failed to install Tailwind CSS'));
+		if (verbose) {
+			console.error(pc.dim(error instanceof Error ? error.message : String(error)));
+		}
+		return false;
+	}
 }
 
 /**
@@ -313,7 +356,7 @@ async function autoInstallTailwind(cwd: string, verbose: boolean): Promise<boole
  * @throws TailwindNotFoundError if Tailwind config is not found and auto-install fails
  */
 export async function init(options: InitOptions): Promise<InitResult> {
-	const { cwd, style = 'default', force = false, verbose = false, registry, autoInstallTailwind: autoInstall = false } = options;
+	const { cwd, style = 'default', force = false, verbose = false, registry, autoInstallTailwind: autoInstall = true } = options;
 
 	// Requirement 4.1, 4.7: Detect svelte.config.js presence
 	const svelteConfigPath = detectSvelteConfig(cwd);
@@ -328,19 +371,14 @@ export async function init(options: InitOptions): Promise<InitResult> {
 	// Requirement 4.2: Detect tailwind.config.ts/js presence (or Tailwind v4 CSS-based)
 	let tailwindConfigPath = detectTailwindConfig(cwd);
 	
-	// Auto-install Tailwind if not found
+	// Prompt user to install Tailwind if not found
 	if (!tailwindConfigPath && autoInstall) {
-		if (verbose) {
-			console.log(pc.yellow(`Tailwind CSS not found, installing automatically...`));
-		}
-		
-		const installed = await autoInstallTailwind(cwd, verbose);
+		const installed = await promptAndInstallTailwind(cwd, verbose);
 		
 		if (installed) {
-			// Re-detect after installation
 			tailwindConfigPath = detectTailwindConfig(cwd);
 			if (verbose && tailwindConfigPath) {
-				console.log(pc.green(`Tailwind CSS installed successfully!`));
+				console.log(pc.green(`Tailwind CSS configured successfully!`));
 			}
 		}
 	}
