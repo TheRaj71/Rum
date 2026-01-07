@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TheRaj71/Rum/main/assets/logo.png" alt="rum logo" width="250" />
+  <img src="https://raw.githubusercontent.com/TheRaj71/Rum/main/assets/logo.png" alt="rum logo" width="1020" />
 </p>
 
-<h1 align="center">rum</h1>
+<h1 align="center">Rum</h1>
 
 <p align="center">
   <strong>A delightful CLI for Svelte 5 component registry</strong>
